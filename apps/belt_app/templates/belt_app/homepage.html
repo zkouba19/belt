@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Review Home Page</title>
+</head>
+<body>
+<div>
+	{% for user in users %}
+		{% if user.id == request.session.id %}
+	<h2>Welcome {{ user.first_name }}</h2>
+		{% endif %}
+	{% endfor %}
+	<button><a href="add/">Add Book and Review</a></button>
+	<button><a href="/log_out">Logout</a></button>
+</div>
+<div>
+	<h3>Recent Reviews</h3>
+	{% for review in reviews %}
+	<p>Book: {{ review.book.title }} Author: {{ review.book.author }}</p>			
+	<p><a href="/user/{{ review.user.id }}">{{ review.user.first_name }}</a> says: {{ review.review }}</p>		
+	{% endfor %}
+	<!-- this is where we will display all our reviews -->
+</div>
+<div>
+	<h3>Other Books with Reviews</h3>
+	<div>
+<!-- here is where we will have a scroll with all the books -->
+		<ul>
+			{% for review in reviews %}
+			<li><a href="{{ review.book.id }}/">{{ review.book.title }}</a></li>
+			{% endfor %}	
+		</ul>
+	</div>
+
+
+
+
+</div>
+</body>
+</html>

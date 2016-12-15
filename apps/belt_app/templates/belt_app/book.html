@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Write a Review for {{ book.title }}</title>
+</head>
+<body>
+<h1>{{ book.title }}</h1>
+<p>Author: {{ book.author }}</p>
+<div>
+	<ol>
+		{% for review in reviews %}
+		<ul>
+			<li>Rating: {{ review.star }}</li>
+			<li><a href=""></a>{{ review.book.user__first_name }}</a>: {{ review.review }}</li>
+			<li>Posted On: {{ review.created_on }}</li>
+		</ul>
+		{% endfor %}
+	</ol>
+</div>
+<div>
+	<form action="process/" method="post">
+	{% csrf_token %}
+		Leave a Review: <textarea name="review"></textarea>
+		Star Rating: <select name="stars">
+			<option value=0>0</option>
+			<option value=1>1</option>
+			<option value=2>2</option>
+			<option value=3>3</option>
+			<option value=4>4</option>
+			<option value=5>5</option>
+		</select>
+		<input type="submit" name="submit">
+	</form>
+</div>
+
+{% for message in messages %}
+
+		{{ message }}
+
+{% endfor %}
+</body>
+</html>
