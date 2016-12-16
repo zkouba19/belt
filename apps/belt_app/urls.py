@@ -6,9 +6,8 @@ urlpatterns = [
     url(r'^login/$', views.login),
     url(r'^homepage/$', views.homepage),
     url(r'^log_out/$', views.log_out),
-    url(r'^homepage/add/$', views.add_book_review),
-    url(r'^homepage/add/process/$', views.process_book),
-    url(r'^homepage/(?P<id>\d*)/$', views.go_to_book),
-    url(r'^homepage/(?P<id>\d*)/process/$', views.new_review),
+    url(r'^add_quote/$', views.add_quote),
+    url(r'^remove_favorite/(?P<id>\d*)/$', views.remove_favorite),
+    url(r'^add_favorite/(?P<id>\d*)/$', views.add_favorite),
     url(r'^user/(?P<id>\d*)/$', views.user),
 ]

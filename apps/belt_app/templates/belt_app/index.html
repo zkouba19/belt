@@ -3,32 +3,44 @@
 <head>
 	<meta charset="utf-8">
 	<title>Index Page</title>
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'belt_app/css/index.css' %}">
 </head>
 <body>
-<h1>Registration</h1>
+<div id="container">
+	
+	{% for message in messages %}
 
-{% for message in messages %}
+			{{ message }}
 
-		{{ message }}
-
-{% endfor %}
-
-<form action="register/" method="post">
-	{% csrf_token %}
-	First Name: <input type="text" name="first_name">
-	Last Name: <input type="text" name="last_name">
-	Email: <input type="text" name="email">
-	Password: <input type="text" name="password">
-	Confirm Password: <input type="text" name="confirm_password">
-	<input type="submit" name="submit">
-	<input type="hidden" name="hidden" value="registration">
-</form>
-<h1>Login</h1>
-<form action="login/" method="post">
-	{% csrf_token %}
-	Email: <input type="text" name="email">
-	Password: <input type="text" name="password">
-	<input type="submit" name="submit">
-</form>
+	{% endfor %}
+	<div id="register">
+		<h1>Registration</h1>
+		<form action="register/" method="post">
+			{% csrf_token %}
+			<p>First Name:</p>
+			<input type="text" name="first_name">
+			<p>Last Name:</p>
+			<input type="text" name="last_name">
+			<p>Email:</p>
+			<input type="text" name="email">
+			<p>Password:</p>
+			<input type="text" name="password">
+			<p>Confirm Password:</p>
+			<input type="text" name="confirm_password">
+			<input type="submit" name="submit">
+			<input type="hidden" name="hidden" value="registration">
+		</form>
+	</div>
+	<div id="login">
+		<h1>Login</h1>
+		<form action="login/" method="post">
+			{% csrf_token %}
+			Email: <input type="text" name="email">
+			Password: <input type="text" name="password">
+			<input type="submit" name="submit">
+		</form>
+	</div>
+</div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib import messages, sessions
-from .models import User, Book, Review
+from .models import User, Quote, Favorite
 
 # Create your views here.
 def index(request):
@@ -32,10 +32,11 @@ def login(request):
 def homepage(request):
 	if request.session['id'] == '':
 		return redirect('/')
+	user = User.objects.get(id = request.session['id'])
 	context = {
-	'users': User.objects.all(),
-	'books': Book.objects.all(),
-	'reviews': Review.objects.all()
+	'users': user,
+	'quotes': Quote.objects.all(),
+	'favorites': Favorite.objects.filter(user = user)
 	}
 	print request.session['id']
 	return render(request, 'belt_app/homepage.html', context)
@@ -44,8 +45,7 @@ def user(request, id):
 	user = User.objects.get(id = id)
 	context = {
 	'user': user,
-	'reviews': Review.objects.filter(user = user),
-	'books': Book.objects.all()
+	'quotes': Quote.objects.filter(user = user)
 	}
 	return render(request, 'belt_app/userpage.html', context)
 
@@ -53,43 +53,28 @@ def log_out(request):
 	request.session.clear()
 	return redirect('/')
 
-def add_book_review(request):
-	context = {
-	'books': Book.objects.all()
-	}
-	return render(request, 'belt_app/add.html', context)
+def add_quote(request):
+	if request.method == "POST":
+		valid_quote = Quote.objects.add_quote(request.POST, request.session['id'])
+		if valid_quote[0] == "invalid":
+			for i in valid_quote[1]:
+				messages.error(request, i)
+				return redirect('/homepage')
+		else:
+			return redirect('/homepage')
 
-def process_book(request):
-	new_book = Book.objects.create_book(request.POST, request.session['id'])
-	if new_book[0] == "invalid":
-		for i in new_book[1]:
+def remove_favorite(request, id):
+	Quote.objects.remove_favorite(user_id = request.session['id'], quote_id = id)
+	return redirect('/homepage')
+
+def add_favorite(request, id):
+	valid_add = Quote.objects.add_favorite(user_id = request.session['id'], quote_id = id)
+	if valid_add[0] == "invalid":
+		for i in valid_add[1]:
 			messages.error(request, i)
-		return redirect('/homepage/add')
+			return redirect('/homepage')
 	else:
 		return redirect('/homepage')
-
-def go_to_book(request, id):
-	book = Book.objects.get(id = id)
-	context = {
-	'book': book,
-	'reviews': Review.objects.filter(book = book)
-
-	}
-	return render(request, 'belt_app/book.html', context)
-
-def new_review(request, id):
-	valid_review = Book.objects.create_review(request.POST, id, request.session['id'])
-	if valid_review[0] == "invalid":
-		for i in valid_review[1]:
-			messages.error(request, i)
-		return redirect('/homepage/'+id) 
-	else: 
-		return redirect('/homepage')
-
-
-
-
-
 
 
 

@@ -38,6 +38,9 @@ class UserManager(models.Manager):
 			errors.append('Email cannot be blank')
 		if not re.match(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$', postData['email']):
 			errors.append('email invalid')
+		valid_email = User.objects.filter(email = postData['email'])
+		if not valid_email:
+			errors.append('This email does not exist in our system. Please register a new account!')
 		if len(postData['password']) < 1: 
 			errors.append('Password cannot be empty')
 		if errors == []:
@@ -51,42 +54,38 @@ class UserManager(models.Manager):
 		else:
 			return ["invalid", errors]
 
-class BookManager(models.Manager):
-	def create_book(self, postData, id):
+class QuoteManager(models.Manager):
+	def add_quote(self, postData, id):
 		errors = []
-		author = postData['existing_author']
-		if postData['title'] < 1:
-			errors.append("Title cannot be empty")
-		book_exists = Book.objects.filter(title= postData['title'])
-		if book_exists:
-			errors.append("This book already exists please find it on the homepage to make a review")
-		if postData['existing_author'] == "none":
-			author = postData['new_author']
-			if len(postData['new_author']) < 1:
-				errors.append("Please select an author or create a new one")
-		if len(postData['review']) < 1:
-			errors.append("Review field cannot be empty")
+		if len(postData['author']) < 3:
+			errors.append('Quoted By field must contain at least 3 characters.')
+		if len(postData['quote']) < 10:
+			errors.append('Message field must contain at least 10 characters.')
 		if errors == []:
-			Book.objects.create(title = postData['title'], author = author)
-			user = User.objects.get(id= id)
-			book = Book.objects.get(title= postData['title'])
-			Review.objects.create(review = postData['review'], stars= postData['stars'], user= user, book= book)
-			return ["valid", book]
-		else: 
-			return ["invalid", errors]
-
-	def create_review(self, postData, bookid, userid):
-		errors = []
-		if len(postData['review']) < 1:
-			errors.append("Review field cannot be empty")
-		if errors == []:
-			user = User.objects.get(id= userid)
-			book = Book.objects.get(id= bookid)
-			Review.objects.create(review = postData['review'], stars= postData['stars'], user= user, book= book)	
-			return ["valid", book]
+			user = User.objects.get(id = id)
+			quote = Quote.objects.create(quote = postData['quote'], author = postData['author'], user = user)
+			Favorite.objects.create(user = user, quote = quote)
+			return ["valid", user]
 		else:
 			return ["invalid", errors]
 
+	def remove_favorite(self, user_id, quote_id):
+		find_user = User.objects.get(id = user_id)
+		find_quote = Quote.objects.get(id = quote_id)
+		remove_favorite = Favorite.objects.get(user = find_user, quote = find_quote).delete()
+		return True
+
+	def add_favorite(self, user_id, quote_id):
+		errors = []
+		find_user = User.objects.get(id = user_id)
+		find_quote = Quote.objects.get(id = quote_id)
+		favorite_exists = Favorite.objects.filter(user = find_user, quote = find_quote)
+		if not favorite_exists:
+			add_favorite = Favorite.objects.create(user = find_user, quote = find_quote)
+			return ["valid", find_user]
+		else: 
+			errors.append('You have already Favorited this Quote!')
+			return["invalid", errors]
 
 
 class User(models.Model):
@@ -94,25 +93,21 @@ class User(models.Model):
 	last_name = models.CharField(max_length = 100)
 	email = models.CharField(max_length = 100)
 	password = models.CharField(max_length = 250)
+	birthday = models.CharField(max_length = 10)
 	created_on = models.DateTimeField(auto_now_add = True)
 	objects = UserManager()
 
-class Book(models.Model):
-	title = models.CharField(max_length = 100)
+class Quote(models.Model):
+	quote = models.CharField(max_length = 100)
 	author = models.CharField(max_length = 100)
+	user = models.ForeignKey(User)
 	created_on = models.DateTimeField(auto_now_add = True)
-	objects = BookManager()
+	objects = QuoteManager()
 
 
-class Review(models.Model):
-	review = models.CharField(max_length = 1000)
-	stars = models.CharField(max_length = 1)
-	created_on = models.DateTimeField(auto_now_add = True)
-	user = models.ForeignKey('User')
-	book = models.ForeignKey('Book')
-
-
-
+class Favorite(models.Model):
+	user = models.ForeignKey(User)
+	quote = models.ForeignKey(Quote)
 
 
 

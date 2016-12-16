@@ -5,13 +5,11 @@
 	<title>User Page</title>
 </head>
 <body>
-<h1>{{ user.first_name }} {{ user.last_name }}</h1>
-<button><a href="add/">Add Book and Review</a></button>
-<button><a href="/homepage">Home</a></button>
+<h1>Posts By: {{ user.first_name }} {{ user.last_name }}</h1>
+<button><a href="/homepage">Dashboard</a></button>
 <button><a href="/log_out">Logout</a></button>
-{% for review in reviews %}
-		<p><a href="{{ review.book.id }}/">{{ review.book.title }}</a>: {{ review.review }}</p>
-		<p>Stars: {{ review.stars}}</p>
+{% for quote in quotes %}
+	<p>{{ quote.author }}:  {{ quote.quote }}</p>
 {% endfor %}
 </body>
 </html>
